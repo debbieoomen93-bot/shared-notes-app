@@ -1,20 +1,39 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 function Toolbar() {
-  const execFormat = (command) => {
-    document.execCommand(command, false, null);
+  const savedRangeRef = useRef(null);
+
+  // Save the current editor selection before a toolbar interaction can steal focus
+  const saveCurrentSelection = () => {
+    const sel = window.getSelection();
+    if (sel.rangeCount > 0) {
+      savedRangeRef.current = sel.getRangeAt(0).cloneRange();
+    }
   };
 
-  // Prevent mousedown from stealing focus away from the contentEditable editor
   const preventFocusLoss = (e) => {
+    saveCurrentSelection();
     e.preventDefault();
   };
 
+  const execFormat = (command) => {
+    // Restore selection if focus was lost (mobile touch steals focus before mousedown)
+    if (savedRangeRef.current) {
+      const sel = window.getSelection();
+      const editor = document.querySelector('.editor-content');
+      if (editor && (!sel.rangeCount || !editor.contains(sel.anchorNode))) {
+        editor.focus();
+        sel.removeAllRanges();
+        sel.addRange(savedRangeRef.current);
+      }
+    }
+    document.execCommand(command, false, null);
+  };
+
   return (
-    <div className="toolbar">
+    <div className="toolbar" onMouseDown={preventFocusLoss} onTouchStart={saveCurrentSelection}>
       <button
         className="toolbar-btn"
-        onMouseDown={preventFocusLoss}
         onClick={() => execFormat('bold')}
         title="Bold (Ctrl+B)"
       >
@@ -22,7 +41,6 @@ function Toolbar() {
       </button>
       <button
         className="toolbar-btn"
-        onMouseDown={preventFocusLoss}
         onClick={() => execFormat('italic')}
         title="Italic (Ctrl+I)"
       >
@@ -30,7 +48,6 @@ function Toolbar() {
       </button>
       <button
         className="toolbar-btn"
-        onMouseDown={preventFocusLoss}
         onClick={() => execFormat('underline')}
         title="Underline (Ctrl+U)"
       >
@@ -39,7 +56,6 @@ function Toolbar() {
       <div className="toolbar-divider" />
       <button
         className="toolbar-btn"
-        onMouseDown={preventFocusLoss}
         onClick={() => execFormat('insertUnorderedList')}
         title="Bullet List"
       >
@@ -47,7 +63,6 @@ function Toolbar() {
       </button>
       <button
         className="toolbar-btn"
-        onMouseDown={preventFocusLoss}
         onClick={() => execFormat('insertOrderedList')}
         title="Numbered List"
       >
@@ -56,7 +71,6 @@ function Toolbar() {
       <div className="toolbar-divider" />
       <button
         className="toolbar-btn"
-        onMouseDown={preventFocusLoss}
         onClick={() => execFormat('strikeThrough')}
         title="Strikethrough"
       >
