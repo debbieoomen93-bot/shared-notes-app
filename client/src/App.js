@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import NotesList from './components/NotesList';
 import NoteEditor from './components/NoteEditor';
 import TrashBin from './components/TrashBin';
@@ -27,6 +27,43 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const userColor = getUserColor(username);
+  const touchStartRef = useRef(null);
+  const touchStartYRef = useRef(null);
+
+  // Swipe gesture handling
+  useEffect(() => {
+    const handleTouchStart = (e) => {
+      touchStartRef.current = e.touches[0].clientX;
+      touchStartYRef.current = e.touches[0].clientY;
+    };
+
+    const handleTouchEnd = (e) => {
+      if (touchStartRef.current === null) return;
+      const deltaX = e.changedTouches[0].clientX - touchStartRef.current;
+      const deltaY = e.changedTouches[0].clientY - touchStartYRef.current;
+      const minSwipe = 60;
+
+      // Only trigger if horizontal swipe is dominant
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipe) {
+        if (deltaX > 0 && touchStartRef.current < 50) {
+          // Swipe right from left edge → open sidebar
+          setSidebarOpen(true);
+        } else if (deltaX < 0 && sidebarOpen) {
+          // Swipe left while sidebar open → close sidebar
+          setSidebarOpen(false);
+        }
+      }
+      touchStartRef.current = null;
+      touchStartYRef.current = null;
+    };
+
+    document.addEventListener('touchstart', handleTouchStart, { passive: true });
+    document.addEventListener('touchend', handleTouchEnd, { passive: true });
+    return () => {
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [sidebarOpen]);
 
   // Apply theme to document
   useEffect(() => {
