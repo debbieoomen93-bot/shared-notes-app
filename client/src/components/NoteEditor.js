@@ -54,17 +54,42 @@ function NoteEditor({ note, onUpdate, saveStatus }) {
     }
   };
 
-  const scrollCaretIntoView = () => {
+  const scrollCaretIntoView = useCallback(() => {
     const selection = window.getSelection();
     if (selection.rangeCount > 0 && contentRef.current) {
       const range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
       const editorRect = contentRef.current.getBoundingClientRect();
+
+      // Scroll down if caret/selection end is below the visible area
       if (rect.bottom > editorRect.bottom) {
         contentRef.current.scrollTop += rect.bottom - editorRect.bottom + 16;
       }
+      // Scroll up if caret/selection start is above the visible area
+      if (rect.top < editorRect.top) {
+        contentRef.current.scrollTop -= editorRect.top - rect.top + 16;
+      }
     }
-  };
+  }, []);
+
+  // Listen for selectionchange to auto-scroll during text selection on mobile
+  useEffect(() => {
+    const handleSelectionChange = () => {
+      const selection = window.getSelection();
+      if (
+        selection.rangeCount > 0 &&
+        contentRef.current &&
+        contentRef.current.contains(selection.anchorNode)
+      ) {
+        scrollCaretIntoView();
+      }
+    };
+
+    document.addEventListener('selectionchange', handleSelectionChange);
+    return () => {
+      document.removeEventListener('selectionchange', handleSelectionChange);
+    };
+  }, [scrollCaretIntoView]);
 
   const handleContentChange = () => {
     if (contentRef.current) {

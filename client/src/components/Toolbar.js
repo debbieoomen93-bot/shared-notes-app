@@ -5,10 +5,16 @@ function Toolbar() {
     document.execCommand(command, false, null);
   };
 
+  // Prevent mousedown from stealing focus away from the contentEditable editor
+  const preventFocusLoss = (e) => {
+    e.preventDefault();
+  };
+
   return (
     <div className="toolbar">
       <button
         className="toolbar-btn"
+        onMouseDown={preventFocusLoss}
         onClick={() => execFormat('bold')}
         title="Bold (Ctrl+B)"
       >
@@ -16,6 +22,7 @@ function Toolbar() {
       </button>
       <button
         className="toolbar-btn"
+        onMouseDown={preventFocusLoss}
         onClick={() => execFormat('italic')}
         title="Italic (Ctrl+I)"
       >
@@ -23,6 +30,7 @@ function Toolbar() {
       </button>
       <button
         className="toolbar-btn"
+        onMouseDown={preventFocusLoss}
         onClick={() => execFormat('underline')}
         title="Underline (Ctrl+U)"
       >
@@ -31,6 +39,7 @@ function Toolbar() {
       <div className="toolbar-divider" />
       <button
         className="toolbar-btn"
+        onMouseDown={preventFocusLoss}
         onClick={() => execFormat('insertUnorderedList')}
         title="Bullet List"
       >
@@ -38,6 +47,7 @@ function Toolbar() {
       </button>
       <button
         className="toolbar-btn"
+        onMouseDown={preventFocusLoss}
         onClick={() => execFormat('insertOrderedList')}
         title="Numbered List"
       >
@@ -46,6 +56,7 @@ function Toolbar() {
       <div className="toolbar-divider" />
       <button
         className="toolbar-btn"
+        onMouseDown={preventFocusLoss}
         onClick={() => execFormat('strikeThrough')}
         title="Strikethrough"
       >
