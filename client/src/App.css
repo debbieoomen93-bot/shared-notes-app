@@ -61,17 +61,17 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg-main);
   color: var(--text-primary);
-  height: 100vh;
+  height: var(--app-height, 100vh);
   overflow: hidden;
 }
 
 #root {
-  height: 100vh;
+  height: var(--app-height, 100vh);
 }
 
 .app {
   display: flex;
-  height: 100vh;
+  height: var(--app-height, 100vh);
 }
 
 /* Username modal */

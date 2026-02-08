@@ -35,6 +35,20 @@ function App() {
   const touchStartRef = useRef(null);
   const touchStartYRef = useRef(null);
 
+  // Resize layout when mobile keyboard appears/disappears
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+
+    const updateHeight = () => {
+      document.documentElement.style.setProperty('--app-height', `${viewport.height}px`);
+    };
+
+    updateHeight();
+    viewport.addEventListener('resize', updateHeight);
+    return () => viewport.removeEventListener('resize', updateHeight);
+  }, []);
+
   // Swipe gesture handling
   useEffect(() => {
     const handleTouchStart = (e) => {
