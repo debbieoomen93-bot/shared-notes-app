@@ -145,13 +145,16 @@ function App() {
       <div className="main">
         {/* Mobile top bar */}
         <div className="mobile-topbar">
-          <button className="btn-hamburger" onClick={() => setSidebarOpen(true)} title="Open menu">
-            <span /><span /><span />
-          </button>
-          <h2 className="mobile-title">
-            {showTrash ? 'Trash' : activeNote ? getDisplayTitle(activeNote) : 'Shared Notes'}
-          </h2>
-          <button className="btn-new-mobile" onClick={handleCreateNote} title="New Note">+</button>
+          <div className="mobile-topbar-brand">TamDebNotes</div>
+          <div className="mobile-topbar-row">
+            <button className="btn-hamburger" onClick={() => setSidebarOpen(true)} title="Open menu">
+              <span /><span /><span />
+            </button>
+            <h2 className="mobile-title">
+              {showTrash ? 'Trash' : activeNote ? getDisplayTitle(activeNote) : 'Select a note'}
+            </h2>
+            <button className="btn-new-mobile" onClick={handleCreateNote} title="New Note">+</button>
+          </div>
         </div>
 
         {showTrash ? (
