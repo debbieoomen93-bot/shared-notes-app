@@ -742,7 +742,8 @@ body {
   .mobile-topbar {
     display: flex;
     align-items: center;
-    padding: 10px 12px;
+    padding: 12px 12px;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
     background: var(--bg-toolbar);
     border-bottom: 1px solid var(--border-color);
     gap: 10px;
@@ -823,6 +824,7 @@ body {
     z-index: 100;
     transform: translateX(-100%);
     transition: transform 0.25s ease;
+    padding-top: env(safe-area-inset-top, 0px);
   }
 
   .sidebar.open {
@@ -949,7 +951,8 @@ body {
   }
 
   .mobile-topbar {
-    padding: 8px;
+    padding: 10px 8px;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 10px);
   }
 
   .editor-header {
