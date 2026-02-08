@@ -71,7 +71,15 @@ function NoteEditor({ note, onUpdate, saveStatus }) {
         data-placeholder="Start typing your note..."
       />
       <div className="editor-footer">
-        Last updated: {new Date(note.updatedAt).toLocaleString()}
+        <div className="editor-footer-left">
+          <span>Created by {note.createdBy || 'Unknown'} on {new Date(note.createdAt).toLocaleString()}</span>
+          {note.lastEditedBy && (
+            <span className="edited-by">
+              <span className="edited-by-avatar">{note.lastEditedBy.charAt(0).toUpperCase()}</span>
+              Last edited by {note.lastEditedBy} at {new Date(note.updatedAt).toLocaleString()}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

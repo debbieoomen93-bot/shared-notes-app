@@ -29,7 +29,7 @@ export function subscribeToNotes(callback) {
   });
 }
 
-export function createNote() {
+export function createNote(username) {
   const notesRef = ref(db, 'notes');
   const newNoteRef = push(notesRef);
   const now = Date.now();
@@ -37,7 +37,9 @@ export function createNote() {
     title: 'Untitled Note',
     content: '',
     createdAt: now,
+    createdBy: username || 'Unknown',
     updatedAt: now,
+    lastEditedBy: username || 'Unknown',
     deleted: false,
     deletedAt: null
   };

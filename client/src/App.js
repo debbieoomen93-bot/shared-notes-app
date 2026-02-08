@@ -6,11 +6,40 @@ import Toolbar from './components/Toolbar';
 import { subscribeToNotes, createNote, updateNote, softDeleteNote } from './firebase';
 import './App.css';
 
+function getUsername() {
+  return localStorage.getItem('shared-notes-username');
+}
+
+function getTheme() {
+  return localStorage.getItem('shared-notes-theme') || 'light';
+}
+
 function App() {
   const [notes, setNotes] = useState([]);
   const [activeNoteId, setActiveNoteId] = useState(null);
   const [showTrash, setShowTrash] = useState(false);
   const [saveStatus, setSaveStatus] = useState('saved');
+  const [username, setUsername] = useState(getUsername);
+  const [usernameInput, setUsernameInput] = useState('');
+  const [theme, setTheme] = useState(getTheme);
+
+  // Apply theme to document
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('shared-notes-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
+  const handleSetUsername = () => {
+    const trimmed = usernameInput.trim();
+    if (trimmed) {
+      localStorage.setItem('shared-notes-username', trimmed);
+      setUsername(trimmed);
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = subscribeToNotes((allNotes) => {
@@ -24,10 +53,10 @@ function App() {
   const activeNote = notes.find(n => n.id === activeNoteId);
 
   const handleCreateNote = useCallback(() => {
-    const id = createNote();
+    const id = createNote(username);
     setActiveNoteId(id);
     setShowTrash(false);
-  }, []);
+  }, [username]);
 
   const handleSelectNote = useCallback((id) => {
     setActiveNoteId(id);
@@ -43,17 +72,49 @@ function App() {
 
   const handleUpdateNote = useCallback((id, updates) => {
     setSaveStatus('saving');
-    updateNote(id, updates).then(() => {
+    updateNote(id, { ...updates, lastEditedBy: username }).then(() => {
       setSaveStatus('saved');
     });
-  }, []);
+  }, [username]);
+
+  // Show username prompt if no username set
+  if (!username) {
+    return (
+      <div className="username-modal-overlay">
+        <div className="username-modal">
+          <h2>Welcome to Shared Notes</h2>
+          <p>Enter your name so others can see who made changes</p>
+          <input
+            type="text"
+            placeholder="Your name..."
+            value={usernameInput}
+            onChange={(e) => setUsernameInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSetUsername()}
+            autoFocus
+          />
+          <button onClick={handleSetUsername} disabled={!usernameInput.trim()}>
+            Get Started
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="app">
       <div className="sidebar">
         <div className="sidebar-header">
           <h1>Shared Notes</h1>
-          <button className="btn-new" onClick={handleCreateNote} title="New Note">+</button>
+          <div className="sidebar-header-actions">
+            <button className="btn-theme" onClick={toggleTheme} title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
+              {theme === 'light' ? '\u263E' : '\u2600'}
+            </button>
+            <button className="btn-new" onClick={handleCreateNote} title="New Note">+</button>
+          </div>
+        </div>
+        <div className="sidebar-user">
+          <div className="user-avatar">{username.charAt(0).toUpperCase()}</div>
+          <span>{username}</span>
         </div>
         <NotesList
           notes={activeNotes}
