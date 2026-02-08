@@ -1,4 +1,5 @@
 import React from 'react';
+import { getUserColor, getUserInitial } from '../userColor';
 
 function NotesList({ notes, activeNoteId, onSelect, onDelete }) {
   const stripHtml = (html) => {
@@ -17,30 +18,42 @@ function NotesList({ notes, activeNoteId, onSelect, onDelete }) {
 
   return (
     <div className="notes-list">
-      {notes.map(note => (
-        <div
-          key={note.id}
-          className={`note-item ${note.id === activeNoteId ? 'active' : ''}`}
-          onClick={() => onSelect(note.id)}
-        >
-          <div className="note-item-content">
-            <div className="note-item-title">{note.title || 'Untitled Note'}</div>
-            <div className="note-item-preview">
-              {stripHtml(note.content).substring(0, 80) || 'Empty note'}
-            </div>
-            <div className="note-item-date">
-              {new Date(note.updatedAt).toLocaleDateString()}
-            </div>
-          </div>
-          <button
-            className="note-item-delete"
-            onClick={(e) => { e.stopPropagation(); onDelete(note.id); }}
-            title="Move to trash"
+      {notes.map(note => {
+        const editorColor = getUserColor(note.lastEditedBy);
+        return (
+          <div
+            key={note.id}
+            className={`note-item ${note.id === activeNoteId ? 'active' : ''}`}
+            onClick={() => onSelect(note.id)}
           >
-            &#128465;
-          </button>
-        </div>
-      ))}
+            <div className="note-item-color-bar" style={{ background: editorColor.bg }} />
+            <div className="note-item-content">
+              <div className="note-item-title">{note.title || 'Untitled Note'}</div>
+              <div className="note-item-preview">
+                {stripHtml(note.content).substring(0, 80) || 'Empty note'}
+              </div>
+              <div className="note-item-meta">
+                <span className="note-item-date">
+                  {new Date(note.updatedAt).toLocaleDateString()}
+                </span>
+                {note.lastEditedBy && (
+                  <span className="note-item-author">
+                    <span className="note-item-author-dot" style={{ background: editorColor.bg }} />
+                    {note.lastEditedBy}
+                  </span>
+                )}
+              </div>
+            </div>
+            <button
+              className="note-item-delete"
+              onClick={(e) => { e.stopPropagation(); onDelete(note.id); }}
+              title="Move to trash"
+            >
+              &#128465;
+            </button>
+          </div>
+        );
+      })}
     </div>
   );
 }

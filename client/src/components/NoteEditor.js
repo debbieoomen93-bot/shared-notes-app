@@ -1,10 +1,14 @@
 import React, { useRef, useEffect, useCallback } from 'react';
+import { getUserColor, getUserInitial } from '../userColor';
 
 function NoteEditor({ note, onUpdate, saveStatus }) {
   const titleRef = useRef(null);
   const contentRef = useRef(null);
   const saveTimerRef = useRef(null);
   const lastNoteIdRef = useRef(null);
+
+  const creatorColor = getUserColor(note.createdBy);
+  const editorColor = getUserColor(note.lastEditedBy);
 
   // When switching notes, update the editor content
   useEffect(() => {
@@ -72,11 +76,24 @@ function NoteEditor({ note, onUpdate, saveStatus }) {
       />
       <div className="editor-footer">
         <div className="editor-footer-left">
-          <span>Created by {note.createdBy || 'Unknown'} on {new Date(note.createdAt).toLocaleString()}</span>
+          <span className="edited-by">
+            <span className="edited-by-avatar" style={{ background: creatorColor.bg }}>
+              {getUserInitial(note.createdBy)}
+            </span>
+            <span className="edited-by-name" style={{ color: creatorColor.accent }}>
+              {note.createdBy || 'Unknown'}
+            </span>
+            <span>created on {new Date(note.createdAt).toLocaleString()}</span>
+          </span>
           {note.lastEditedBy && (
             <span className="edited-by">
-              <span className="edited-by-avatar">{note.lastEditedBy.charAt(0).toUpperCase()}</span>
-              Last edited by {note.lastEditedBy} at {new Date(note.updatedAt).toLocaleString()}
+              <span className="edited-by-avatar" style={{ background: editorColor.bg }}>
+                {getUserInitial(note.lastEditedBy)}
+              </span>
+              <span className="edited-by-name" style={{ color: editorColor.accent }}>
+                {note.lastEditedBy}
+              </span>
+              <span>edited at {new Date(note.updatedAt).toLocaleString()}</span>
             </span>
           )}
         </div>

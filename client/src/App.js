@@ -4,6 +4,7 @@ import NoteEditor from './components/NoteEditor';
 import TrashBin from './components/TrashBin';
 import Toolbar from './components/Toolbar';
 import { subscribeToNotes, createNote, updateNote, softDeleteNote } from './firebase';
+import { getUserColor, getUserInitial } from './userColor';
 import './App.css';
 
 function getUsername() {
@@ -23,6 +24,8 @@ function App() {
   const [usernameInput, setUsernameInput] = useState('');
   const [theme, setTheme] = useState(getTheme);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const userColor = getUserColor(username);
 
   // Apply theme to document
   useEffect(() => {
@@ -119,7 +122,9 @@ function App() {
           </div>
         </div>
         <div className="sidebar-user">
-          <div className="user-avatar">{username.charAt(0).toUpperCase()}</div>
+          <div className="user-avatar" style={{ background: userColor.bg }}>
+            {getUserInitial(username)}
+          </div>
           <span>{username}</span>
         </div>
         <NotesList
