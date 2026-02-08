@@ -147,6 +147,16 @@ body {
   cursor: not-allowed;
 }
 
+/* Mobile top bar - hidden on desktop */
+.mobile-topbar {
+  display: none;
+}
+
+/* Sidebar overlay - hidden on desktop */
+.sidebar-overlay {
+  display: none;
+}
+
 /* Sidebar */
 .sidebar {
   width: 300px;
@@ -658,12 +668,182 @@ body {
   background: #444;
 }
 
-/* Responsive */
+/* Responsive - Mobile */
 @media (max-width: 768px) {
-  .sidebar {
-    width: 240px;
+  /* Mobile top bar */
+  .mobile-topbar {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--bg-toolbar);
+    border-bottom: 1px solid var(--border-color);
+    gap: 12px;
+    flex-shrink: 0;
   }
+
+  .btn-hamburger {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 8px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .btn-hamburger:active {
+    background: var(--toolbar-btn-hover);
+  }
+
+  .btn-hamburger span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: var(--text-primary);
+    border-radius: 1px;
+  }
+
+  .mobile-title {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+
+  .btn-new-mobile {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: none;
+    background: #6c5ce7;
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* Sidebar overlay */
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+  }
+
+  /* Slide-in sidebar */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    z-index: 100;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Editor adjustments */
+  .editor-header {
+    padding: 12px 16px 0;
+  }
+
   .editor-title {
     font-size: 22px;
+  }
+
+  .editor-content {
+    padding: 12px 16px;
+    font-size: 15px;
+  }
+
+  .editor-footer {
+    padding: 8px 16px;
+  }
+
+  .editor-footer-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  /* Toolbar adjustments */
+  .toolbar {
+    padding: 8px 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .toolbar-btn {
+    padding: 8px 12px;
+    flex-shrink: 0;
+    min-height: 38px;
+  }
+
+  /* Trash adjustments */
+  .trash-bin {
+    padding: 20px 16px;
+  }
+
+  .trash-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .trash-item-actions {
+    width: 100%;
+  }
+
+  .btn-restore,
+  .btn-perm-delete {
+    flex: 1;
+    text-align: center;
+    padding: 10px 16px;
+  }
+
+  /* Note delete button always visible on mobile */
+  .note-item-delete {
+    opacity: 0.5;
+  }
+
+  /* Bigger touch targets */
+  .note-item {
+    padding: 14px;
+  }
+
+  .btn-trash {
+    padding: 16px 20px;
+  }
+
+  /* Username modal */
+  .username-modal {
+    padding: 28px 20px;
+  }
+
+  /* Empty state */
+  .empty-icon {
+    font-size: 48px;
+  }
+
+  .empty-state h2 {
+    font-size: 18px;
   }
 }

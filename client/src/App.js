@@ -22,6 +22,7 @@ function App() {
   const [username, setUsername] = useState(getUsername);
   const [usernameInput, setUsernameInput] = useState('');
   const [theme, setTheme] = useState(getTheme);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Apply theme to document
   useEffect(() => {
@@ -56,11 +57,13 @@ function App() {
     const id = createNote(username);
     setActiveNoteId(id);
     setShowTrash(false);
+    setSidebarOpen(false);
   }, [username]);
 
   const handleSelectNote = useCallback((id) => {
     setActiveNoteId(id);
     setShowTrash(false);
+    setSidebarOpen(false);
   }, []);
 
   const handleDeleteNote = useCallback((id) => {
@@ -102,7 +105,10 @@ function App() {
 
   return (
     <div className="app">
-      <div className="sidebar">
+      {/* Mobile overlay */}
+      {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
+
+      <div className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <h1>Shared Notes</h1>
           <div className="sidebar-header-actions">
@@ -124,13 +130,24 @@ function App() {
         />
         <button
           className={`btn-trash ${showTrash ? 'active' : ''}`}
-          onClick={() => { setShowTrash(!showTrash); setActiveNoteId(null); }}
+          onClick={() => { setShowTrash(!showTrash); setActiveNoteId(null); setSidebarOpen(false); }}
         >
           <span className="trash-icon">&#128465;</span>
           Trash ({trashedNotes.length})
         </button>
       </div>
       <div className="main">
+        {/* Mobile top bar */}
+        <div className="mobile-topbar">
+          <button className="btn-hamburger" onClick={() => setSidebarOpen(true)} title="Open menu">
+            <span /><span /><span />
+          </button>
+          <h2 className="mobile-title">
+            {showTrash ? 'Trash' : activeNote ? (activeNote.title || 'Untitled Note') : 'Shared Notes'}
+          </h2>
+          <button className="btn-new-mobile" onClick={handleCreateNote} title="New Note">+</button>
+        </div>
+
         {showTrash ? (
           <TrashBin notes={trashedNotes} />
         ) : activeNote && !activeNote.deleted ? (
