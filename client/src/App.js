@@ -16,9 +16,13 @@ function getTheme() {
   return localStorage.getItem('shared-notes-theme') || 'light';
 }
 
+function getLastActiveNoteId() {
+  return localStorage.getItem('shared-notes-active-note');
+}
+
 function App() {
   const [notes, setNotes] = useState([]);
-  const [activeNoteId, setActiveNoteId] = useState(null);
+  const [activeNoteId, setActiveNoteId] = useState(getLastActiveNoteId);
   const [showTrash, setShowTrash] = useState(false);
   const [saveStatus, setSaveStatus] = useState('saved');
   const [username, setUsername] = useState(getUsername);
@@ -83,6 +87,15 @@ function App() {
     }
   };
 
+  // Persist active note selection to localStorage
+  useEffect(() => {
+    if (activeNoteId) {
+      localStorage.setItem('shared-notes-active-note', activeNoteId);
+    } else {
+      localStorage.removeItem('shared-notes-active-note');
+    }
+  }, [activeNoteId]);
+
   useEffect(() => {
     const unsubscribe = subscribeToNotes((allNotes) => {
       setNotes(allNotes);
@@ -92,6 +105,17 @@ function App() {
 
   const activeNotes = notes.filter(n => !n.deleted).sort((a, b) => b.updatedAt - a.updatedAt);
   const trashedNotes = notes.filter(n => n.deleted).sort((a, b) => b.deletedAt - a.deletedAt);
+
+  // Clear restored selection if the note no longer exists or was deleted
+  useEffect(() => {
+    if (activeNoteId && notes.length > 0) {
+      const note = notes.find(n => n.id === activeNoteId);
+      if (!note || note.deleted) {
+        setActiveNoteId(null);
+      }
+    }
+  }, [activeNoteId, notes]);
+
   const activeNote = notes.find(n => n.id === activeNoteId);
 
   const handleCreateNote = useCallback(() => {
