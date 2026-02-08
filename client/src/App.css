@@ -964,7 +964,8 @@ body {
   }
 
   .mobile-topbar {
-    padding: 8px;
+    padding: 10px 8px;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 10px);
   }
 
   .editor-header {
