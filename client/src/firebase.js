@@ -34,7 +34,8 @@ export function createNote(username) {
   const newNoteRef = push(notesRef);
   const now = Date.now();
   const note = {
-    title: 'Untitled Note',
+    title: '',
+    manualTitle: false,
     content: '',
     createdAt: now,
     createdBy: username || 'Unknown',

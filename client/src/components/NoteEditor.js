@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { getUserColor, getUserInitial } from '../userColor';
+import { getAutoTitle } from '../autoTitle';
 
 function NoteEditor({ note, onUpdate, saveStatus }) {
   const titleRef = useRef(null);
@@ -10,18 +11,20 @@ function NoteEditor({ note, onUpdate, saveStatus }) {
   const creatorColor = getUserColor(note.createdBy);
   const editorColor = getUserColor(note.lastEditedBy);
 
+  const isAutoTitle = !note.manualTitle;
+
   // When switching notes, update the editor content
   useEffect(() => {
     if (note.id !== lastNoteIdRef.current) {
       lastNoteIdRef.current = note.id;
       if (titleRef.current) {
-        titleRef.current.value = note.title || '';
+        titleRef.current.value = isAutoTitle ? '' : (note.title || '');
       }
       if (contentRef.current) {
         contentRef.current.innerHTML = note.content || '';
       }
     }
-  }, [note.id, note.title, note.content]);
+  }, [note.id, note.title, note.content, isAutoTitle]);
 
   const debouncedSave = useCallback((id, updates) => {
     if (saveTimerRef.current) {
@@ -42,26 +45,42 @@ function NoteEditor({ note, onUpdate, saveStatus }) {
   }, []);
 
   const handleTitleChange = (e) => {
-    debouncedSave(note.id, { title: e.target.value });
+    const value = e.target.value;
+    if (value === '') {
+      // User cleared the title - go back to auto mode
+      debouncedSave(note.id, { title: '', manualTitle: false });
+    } else {
+      debouncedSave(note.id, { title: value, manualTitle: true });
+    }
   };
 
   const handleContentChange = () => {
     if (contentRef.current) {
-      debouncedSave(note.id, { content: contentRef.current.innerHTML });
+      const html = contentRef.current.innerHTML;
+      const updates = { content: html };
+
+      // Auto-generate title from content if no manual title
+      if (isAutoTitle) {
+        updates.title = getAutoTitle(html);
+      }
+
+      debouncedSave(note.id, updates);
     }
   };
 
   const statusText = saveStatus === 'saving' ? 'Saving...' : 'Saved';
+  const displayTitle = isAutoTitle ? getAutoTitle(note.content) : note.title;
+  const placeholderText = isAutoTitle && displayTitle ? displayTitle : 'Note title...';
 
   return (
     <div className="editor">
       <div className="editor-header">
         <input
           ref={titleRef}
-          className="editor-title"
-          defaultValue={note.title}
+          className={`editor-title ${isAutoTitle && displayTitle ? 'auto-title' : ''}`}
+          defaultValue={isAutoTitle ? '' : (note.title || '')}
           onChange={handleTitleChange}
-          placeholder="Note title..."
+          placeholder={placeholderText}
         />
         <span className={`save-status ${saveStatus}`}>{statusText}</span>
       </div>

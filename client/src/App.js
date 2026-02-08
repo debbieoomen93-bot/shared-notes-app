@@ -5,6 +5,7 @@ import TrashBin from './components/TrashBin';
 import Toolbar from './components/Toolbar';
 import { subscribeToNotes, createNote, updateNote, softDeleteNote } from './firebase';
 import { getUserColor, getUserInitial } from './userColor';
+import { getDisplayTitle } from './autoTitle';
 import './App.css';
 
 function getUsername() {
@@ -148,7 +149,7 @@ function App() {
             <span /><span /><span />
           </button>
           <h2 className="mobile-title">
-            {showTrash ? 'Trash' : activeNote ? (activeNote.title || 'Untitled Note') : 'Shared Notes'}
+            {showTrash ? 'Trash' : activeNote ? getDisplayTitle(activeNote) : 'Shared Notes'}
           </h2>
           <button className="btn-new-mobile" onClick={handleCreateNote} title="New Note">+</button>
         </div>

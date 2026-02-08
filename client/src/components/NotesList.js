@@ -1,5 +1,6 @@
 import React from 'react';
-import { getUserColor, getUserInitial } from '../userColor';
+import { getUserColor } from '../userColor';
+import { getDisplayTitle } from '../autoTitle';
 
 function NotesList({ notes, activeNoteId, onSelect, onDelete }) {
   const stripHtml = (html) => {
@@ -20,6 +21,8 @@ function NotesList({ notes, activeNoteId, onSelect, onDelete }) {
     <div className="notes-list">
       {notes.map(note => {
         const editorColor = getUserColor(note.lastEditedBy);
+        const displayTitle = getDisplayTitle(note);
+        const isAuto = !note.manualTitle && displayTitle !== 'Untitled Note';
         return (
           <div
             key={note.id}
@@ -28,7 +31,7 @@ function NotesList({ notes, activeNoteId, onSelect, onDelete }) {
           >
             <div className="note-item-color-bar" style={{ background: editorColor.bg }} />
             <div className="note-item-content">
-              <div className="note-item-title">{note.title || 'Untitled Note'}</div>
+              <div className={`note-item-title ${isAuto ? 'auto' : ''}`}>{displayTitle}</div>
               <div className="note-item-preview">
                 {stripHtml(note.content).substring(0, 80) || 'Empty note'}
               </div>

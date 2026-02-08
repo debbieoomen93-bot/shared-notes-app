@@ -486,6 +486,17 @@ body {
   color: var(--text-placeholder);
 }
 
+.editor-title.auto-title::placeholder {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Auto-generated title in sidebar */
+.note-item-title.auto {
+  font-style: italic;
+  opacity: 0.85;
+}
+
 .save-status {
   font-size: 12px;
   color: var(--text-faint);
