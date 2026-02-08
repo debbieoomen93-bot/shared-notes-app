@@ -28,7 +28,7 @@ function App() {
   const [username, setUsername] = useState(getUsername);
   const [usernameInput, setUsernameInput] = useState('');
   const [theme, setTheme] = useState(getTheme);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth <= 768);
   const [notesLoaded, setNotesLoaded] = useState(false);
 
   const userColor = getUserColor(username);

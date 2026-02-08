@@ -54,6 +54,18 @@ function NoteEditor({ note, onUpdate, saveStatus }) {
     }
   };
 
+  const scrollCaretIntoView = () => {
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0 && contentRef.current) {
+      const range = selection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      const editorRect = contentRef.current.getBoundingClientRect();
+      if (rect.bottom > editorRect.bottom) {
+        contentRef.current.scrollTop += rect.bottom - editorRect.bottom + 16;
+      }
+    }
+  };
+
   const handleContentChange = () => {
     if (contentRef.current) {
       const html = contentRef.current.innerHTML;
@@ -65,6 +77,7 @@ function NoteEditor({ note, onUpdate, saveStatus }) {
       }
 
       debouncedSave(note.id, updates);
+      scrollCaretIntoView();
     }
   };
 
