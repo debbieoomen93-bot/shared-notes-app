@@ -28,7 +28,8 @@ function App() {
   const [username, setUsername] = useState(getUsername);
   const [usernameInput, setUsernameInput] = useState('');
   const [theme, setTheme] = useState(getTheme);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth <= 768);
+  const [notesLoaded, setNotesLoaded] = useState(false);
 
   const userColor = getUserColor(username);
   const touchStartRef = useRef(null);
@@ -99,6 +100,7 @@ function App() {
   useEffect(() => {
     const unsubscribe = subscribeToNotes((allNotes) => {
       setNotes(allNotes);
+      setNotesLoaded(true);
     });
     return () => unsubscribe();
   }, []);
@@ -106,15 +108,21 @@ function App() {
   const activeNotes = notes.filter(n => !n.deleted).sort((a, b) => b.updatedAt - a.updatedAt);
   const trashedNotes = notes.filter(n => n.deleted).sort((a, b) => b.deletedAt - a.deletedAt);
 
-  // Clear restored selection if the note no longer exists or was deleted
+  // Restore or auto-select a note once notes have loaded
   useEffect(() => {
-    if (activeNoteId && notes.length > 0) {
+    if (!notesLoaded || activeNotes.length === 0) return;
+
+    if (activeNoteId) {
+      // Validate that the saved note still exists and isn't deleted
       const note = notes.find(n => n.id === activeNoteId);
       if (!note || note.deleted) {
-        setActiveNoteId(null);
+        setActiveNoteId(activeNotes[0].id);
       }
+    } else if (!showTrash) {
+      // No saved note — default to the most recently updated note
+      setActiveNoteId(activeNotes[0].id);
     }
-  }, [activeNoteId, notes]);
+  }, [activeNoteId, notes, notesLoaded, activeNotes, showTrash]);
 
   const activeNote = notes.find(n => n.id === activeNoteId);
 
@@ -229,6 +237,10 @@ function App() {
               saveStatus={saveStatus}
             />
           </>
+        ) : !notesLoaded ? (
+          <div className="empty-state">
+            <h2>Loading...</h2>
+          </div>
         ) : (
           <div className="empty-state">
             <div className="empty-icon">&#128221;</div>
