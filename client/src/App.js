@@ -17,19 +17,38 @@ function getTheme() {
   return localStorage.getItem('shared-notes-theme') || 'light';
 }
 
+function getLastActiveNoteId() {
+  return localStorage.getItem('shared-notes-active-note');
+}
+
 function App() {
   const [notes, setNotes] = useState([]);
-  const [activeNoteId, setActiveNoteId] = useState(null);
+  const [activeNoteId, setActiveNoteId] = useState(getLastActiveNoteId);
   const [showTrash, setShowTrash] = useState(false);
   const [saveStatus, setSaveStatus] = useState('saved');
   const [username, setUsername] = useState(getUsername);
   const [usernameInput, setUsernameInput] = useState('');
   const [theme, setTheme] = useState(getTheme);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth <= 768);
+  const [notesLoaded, setNotesLoaded] = useState(false);
 
   const userColor = getUserColor(username);
   const touchStartRef = useRef(null);
   const touchStartYRef = useRef(null);
+
+  // Resize layout when mobile keyboard appears/disappears
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+
+    const updateHeight = () => {
+      document.documentElement.style.setProperty('--app-height', `${viewport.height}px`);
+    };
+
+    updateHeight();
+    viewport.addEventListener('resize', updateHeight);
+    return () => viewport.removeEventListener('resize', updateHeight);
+  }, []);
 
   // Swipe gesture handling
   useEffect(() => {
@@ -84,15 +103,42 @@ function App() {
     }
   };
 
+  // Persist active note selection to localStorage
+  useEffect(() => {
+    if (activeNoteId) {
+      localStorage.setItem('shared-notes-active-note', activeNoteId);
+    } else {
+      localStorage.removeItem('shared-notes-active-note');
+    }
+  }, [activeNoteId]);
+
   useEffect(() => {
     const unsubscribe = subscribeToNotes((allNotes) => {
       setNotes(allNotes);
+      setNotesLoaded(true);
     });
     return () => unsubscribe();
   }, []);
 
   const activeNotes = notes.filter(n => !n.deleted).sort((a, b) => b.updatedAt - a.updatedAt);
   const trashedNotes = notes.filter(n => n.deleted).sort((a, b) => b.deletedAt - a.deletedAt);
+
+  // Restore or auto-select a note once notes have loaded
+  useEffect(() => {
+    if (!notesLoaded || activeNotes.length === 0) return;
+
+    if (activeNoteId) {
+      // Validate that the saved note still exists and isn't deleted
+      const note = notes.find(n => n.id === activeNoteId);
+      if (!note || note.deleted) {
+        setActiveNoteId(activeNotes[0].id);
+      }
+    } else if (!showTrash) {
+      // No saved note — default to the most recently updated note
+      setActiveNoteId(activeNotes[0].id);
+    }
+  }, [activeNoteId, notes, notesLoaded, activeNotes, showTrash]);
+
   const activeNote = notes.find(n => n.id === activeNoteId);
 
   const handleCreateNote = useCallback(() => {
@@ -212,6 +258,10 @@ function App() {
               saveStatus={saveStatus}
             />
           </>
+        ) : !notesLoaded ? (
+          <div className="empty-state">
+            <h2>Loading...</h2>
+          </div>
         ) : (
           <div className="empty-state">
             <div className="empty-icon">&#128221;</div>
