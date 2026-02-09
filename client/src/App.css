@@ -298,6 +298,29 @@ body {
   flex-shrink: 0;
 }
 
+/* Note item image thumbnail */
+.note-item-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.note-item-image-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  opacity: 0.7;
+}
+
 .note-item-content {
   flex: 1;
   min-width: 0;
@@ -468,7 +491,23 @@ body {
   display: flex;
   align-items: center;
   padding: 16px 24px 0;
+  gap: 14px;
+}
+
+.editor-header-image {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.editor-header-text {
+  flex: 1;
+  display: flex;
+  align-items: center;
   gap: 12px;
+  min-width: 0;
 }
 
 .editor-title {

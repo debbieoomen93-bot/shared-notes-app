@@ -3,7 +3,8 @@ import NotesList from './components/NotesList';
 import NoteEditor from './components/NoteEditor';
 import TrashBin from './components/TrashBin';
 import Toolbar from './components/Toolbar';
-import { subscribeToNotes, createNote, updateNote, softDeleteNote } from './firebase';
+import { subscribeToNotes, createNote, updateNote, softDeleteNote, updateNoteImage } from './firebase';
+import { fetchRandomPhoto } from './unsplash';
 import { getUserColor, getUserInitial } from './userColor';
 import { getDisplayTitle } from './autoTitle';
 import './App.css';
@@ -99,6 +100,12 @@ function App() {
     setActiveNoteId(id);
     setShowTrash(false);
     setSidebarOpen(false);
+    // Fetch an Unsplash image in the background
+    fetchRandomPhoto().then((image) => {
+      if (image) {
+        updateNoteImage(id, image);
+      }
+    });
   }, [username]);
 
   const handleSelectNote = useCallback((id) => {
