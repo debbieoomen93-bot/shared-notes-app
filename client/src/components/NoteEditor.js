@@ -113,24 +113,14 @@ function NoteEditor({ note, onUpdate, saveStatus }) {
   return (
     <div className="editor">
       <div className="editor-header">
-        {note.image && (
-          <img
-            className="editor-header-image"
-            src={note.image.small}
-            alt={note.image.alt}
-            style={{ background: note.image.color }}
-          />
-        )}
-        <div className="editor-header-text">
-          <input
-            ref={titleRef}
-            className={`editor-title ${isAutoTitle && displayTitle ? 'auto-title' : ''}`}
-            defaultValue={isAutoTitle ? '' : (note.title || '')}
-            onChange={handleTitleChange}
-            placeholder={placeholderText}
-          />
-          <span className={`save-status ${saveStatus}`}>{statusText}</span>
-        </div>
+        <input
+          ref={titleRef}
+          className={`editor-title ${isAutoTitle && displayTitle ? 'auto-title' : ''}`}
+          defaultValue={isAutoTitle ? '' : (note.title || '')}
+          onChange={handleTitleChange}
+          placeholder={placeholderText}
+        />
+        <span className={`save-status ${saveStatus}`}>{statusText}</span>
       </div>
       <div
         ref={contentRef}

@@ -42,16 +42,10 @@ export function createNote(username) {
     updatedAt: now,
     lastEditedBy: username || 'Unknown',
     deleted: false,
-    deletedAt: null,
-    image: null
+    deletedAt: null
   };
   set(newNoteRef, note);
   return newNoteRef.key;
-}
-
-export function updateNoteImage(noteId, imageData) {
-  const noteRef = ref(db, `notes/${noteId}`);
-  return update(noteRef, { image: imageData });
 }
 
 export function updateNote(noteId, updates) {

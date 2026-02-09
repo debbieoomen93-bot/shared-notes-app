@@ -3,8 +3,7 @@ import NotesList from './components/NotesList';
 import NoteEditor from './components/NoteEditor';
 import TrashBin from './components/TrashBin';
 import Toolbar from './components/Toolbar';
-import { subscribeToNotes, createNote, updateNote, softDeleteNote, updateNoteImage } from './firebase';
-import { fetchRandomPhoto } from './unsplash';
+import { subscribeToNotes, createNote, updateNote, softDeleteNote } from './firebase';
 import { getUserColor, getUserInitial } from './userColor';
 import { getDisplayTitle } from './autoTitle';
 import './App.css';
@@ -35,7 +34,6 @@ function App() {
   const userColor = getUserColor(username);
   const touchStartRef = useRef(null);
   const touchStartYRef = useRef(null);
-  const imagesFetchedRef = useRef(new Set());
 
   // Resize layout when mobile keyboard appears/disappears
   useEffect(() => {
@@ -121,21 +119,6 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  // Backfill Unsplash images for existing notes that don't have one
-  useEffect(() => {
-    if (!notesLoaded) return;
-    notes.forEach((note) => {
-      if (!note.image && !note.deleted && !imagesFetchedRef.current.has(note.id)) {
-        imagesFetchedRef.current.add(note.id);
-        fetchRandomPhoto().then((image) => {
-          if (image) {
-            updateNoteImage(note.id, image);
-          }
-        });
-      }
-    });
-  }, [notes, notesLoaded]);
-
   const activeNotes = notes.filter(n => !n.deleted).sort((a, b) => b.updatedAt - a.updatedAt);
   const trashedNotes = notes.filter(n => n.deleted).sort((a, b) => b.deletedAt - a.deletedAt);
 
@@ -162,12 +145,6 @@ function App() {
     setActiveNoteId(id);
     setShowTrash(false);
     setSidebarOpen(false);
-    // Fetch an Unsplash image in the background
-    fetchRandomPhoto().then((image) => {
-      if (image) {
-        updateNoteImage(id, image);
-      }
-    });
   }, [username]);
 
   const handleSelectNote = useCallback((id) => {

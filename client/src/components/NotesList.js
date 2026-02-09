@@ -30,18 +30,6 @@ function NotesList({ notes, activeNoteId, onSelect, onDelete }) {
             onClick={() => onSelect(note.id)}
           >
             <div className="note-item-color-bar" style={{ background: editorColor.bg }} />
-            {note.image ? (
-              <img
-                className="note-item-image"
-                src={note.image.thumb}
-                alt={note.image.alt}
-                style={{ background: note.image.color }}
-              />
-            ) : (
-              <div className="note-item-image-placeholder" style={{ background: editorColor.bg }}>
-                {displayTitle.charAt(0) || '?'}
-              </div>
-            )}
             <div className="note-item-content">
               <div className={`note-item-title ${isAuto ? 'auto' : ''}`}>{displayTitle}</div>
               <div className="note-item-preview">
