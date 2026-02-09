@@ -35,6 +35,7 @@ function App() {
   const userColor = getUserColor(username);
   const touchStartRef = useRef(null);
   const touchStartYRef = useRef(null);
+  const imagesFetchedRef = useRef(new Set());
 
   // Resize layout when mobile keyboard appears/disappears
   useEffect(() => {
@@ -119,6 +120,21 @@ function App() {
     });
     return () => unsubscribe();
   }, []);
+
+  // Backfill Unsplash images for existing notes that don't have one
+  useEffect(() => {
+    if (!notesLoaded) return;
+    notes.forEach((note) => {
+      if (!note.image && !note.deleted && !imagesFetchedRef.current.has(note.id)) {
+        imagesFetchedRef.current.add(note.id);
+        fetchRandomPhoto().then((image) => {
+          if (image) {
+            updateNoteImage(note.id, image);
+          }
+        });
+      }
+    });
+  }, [notes, notesLoaded]);
 
   const activeNotes = notes.filter(n => !n.deleted).sort((a, b) => b.updatedAt - a.updatedAt);
   const trashedNotes = notes.filter(n => n.deleted).sort((a, b) => b.deletedAt - a.deletedAt);
