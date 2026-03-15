@@ -13,7 +13,7 @@ function getUsername() {
 }
 
 function getTheme() {
-  return localStorage.getItem('shared-notes-theme') || 'light';
+  return localStorage.getItem('shared-notes-theme') || 'dark';
 }
 
 function getLastActiveNoteId() {
@@ -206,7 +206,7 @@ function App() {
           </div>
         </div>
         <div className="sidebar-user">
-          <div className="user-avatar" style={{ background: userColor.bg }}>
+          <div className="user-avatar" style={{ borderColor: userColor.accent, color: userColor.accent }}>
             {getUserInitial(username)}
           </div>
           <span>{username}</span>

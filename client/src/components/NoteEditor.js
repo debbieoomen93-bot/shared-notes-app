@@ -122,6 +122,7 @@ function NoteEditor({ note, onUpdate, saveStatus }) {
         />
         <span className={`save-status ${saveStatus}`}>{statusText}</span>
       </div>
+      <div className="editor-title-divider" />
       <div
         ref={contentRef}
         className="editor-content"
@@ -134,7 +135,7 @@ function NoteEditor({ note, onUpdate, saveStatus }) {
       <div className="editor-footer">
         <div className="editor-footer-left">
           <span className="edited-by">
-            <span className="edited-by-avatar" style={{ background: creatorColor.bg }}>
+            <span className="edited-by-avatar" style={{ borderColor: creatorColor.accent, color: creatorColor.accent }}>
               {getUserInitial(note.createdBy)}
             </span>
             <span className="edited-by-name" style={{ color: creatorColor.accent }}>
@@ -144,7 +145,7 @@ function NoteEditor({ note, onUpdate, saveStatus }) {
           </span>
           {note.lastEditedBy && (
             <span className="edited-by">
-              <span className="edited-by-avatar" style={{ background: editorColor.bg }}>
+              <span className="edited-by-avatar" style={{ borderColor: editorColor.accent, color: editorColor.accent }}>
                 {getUserInitial(note.lastEditedBy)}
               </span>
               <span className="edited-by-name" style={{ color: editorColor.accent }}>
