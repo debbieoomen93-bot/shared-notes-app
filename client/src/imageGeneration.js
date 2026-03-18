@@ -1,18 +1,27 @@
-// Calls the server's /api/generate-image endpoint, then compresses the
-// returned image to an 800x450 JPEG data URL (~40-80 KB) using a canvas.
-// The compressed data URL is safe to store directly in Firebase.
+// Generates an image via Pollinations.ai (free, no API key required).
+// Fetches the image, compresses it to an 800x450 JPEG data URL (~40-80 KB),
+// and returns it ready for storage in Firebase.
 
 export async function generateNoteImage(title, content) {
-  const response = await fetch('/api/generate-image', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title, content }),
-  });
+  const plainText = (content || '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .substring(0, 300);
 
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.error || `Server returned ${response.status}`);
-  }
+  const noteTitle = (title || 'Untitled').substring(0, 100);
+
+  const prompt = [
+    `atmospheric painterly illustration for a note titled "${noteTitle}"`,
+    plainText ? `about: ${plainText}` : '',
+    'cinematic mood, dramatic lighting, rich deep tones, highly detailed, no text, no letters, no words',
+  ].filter(Boolean).join(', ');
+
+  const seed = Math.floor(Math.random() * 1_000_000);
+  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=800&height=450&nologo=true&seed=${seed}`;
+
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Pollinations returned ${response.status}`);
 
   const blob = await response.blob();
 
@@ -26,11 +35,10 @@ export async function generateNoteImage(title, content) {
       canvas.height = 450;
       const ctx = canvas.getContext('2d');
 
-      // Fill with a dark fallback in case the image has transparency
       ctx.fillStyle = '#0b0b14';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Cover-fit: scale and centre-crop the source image
+      // Cover-fit: scale and centre-crop
       const srcRatio = img.width / img.height;
       const dstRatio = canvas.width / canvas.height;
       let sx, sy, sw, sh;
