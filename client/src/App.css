@@ -140,6 +140,29 @@
   box-shadow: 0 0 16px rgba(201, 164, 66, 0.2);
 }
 
+/* Manual generate button — shown when no image exists yet */
+.editor-banner-generate {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(201, 164, 66, 0.08);
+  color: rgba(201, 164, 66, 0.35);
+  font-size: 11px;
+  font-family: inherit;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+
+.editor-banner-generate:hover {
+  color: var(--gold);
+  background: rgba(201, 164, 66, 0.04);
+}
+
 /* =====================
    DARK LUXURY THEME
    ===================== */

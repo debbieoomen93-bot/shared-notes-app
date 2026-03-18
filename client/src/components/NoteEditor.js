@@ -129,7 +129,11 @@ function NoteEditor({ note, onUpdate, saveStatus, isGeneratingImage, onGenerateI
             ✦ Regenerate
           </button>
         </div>
-      ) : null}
+      ) : (
+        <button className="editor-banner-generate" onClick={onGenerateImage}>
+          ✦ Generate image
+        </button>
+      )}
 
       <div className="editor-header">
         <input
