@@ -2,7 +2,7 @@ import React from 'react';
 import { getUserColor } from '../userColor';
 import { getDisplayTitle } from '../autoTitle';
 
-function NotesList({ notes, activeNoteId, onSelect, onDelete }) {
+function NotesList({ notes, activeNoteId, onSelect, onDelete, generatingImages }) {
   const stripHtml = (html) => {
     const tmp = document.createElement('div');
     tmp.innerHTML = html || '';
@@ -23,13 +23,20 @@ function NotesList({ notes, activeNoteId, onSelect, onDelete }) {
         const editorColor = getUserColor(note.lastEditedBy);
         const displayTitle = getDisplayTitle(note);
         const isAuto = !note.manualTitle && displayTitle !== 'Untitled Note';
+        const isGenerating = generatingImages && generatingImages.has(note.id);
         return (
           <div
             key={note.id}
             className={`note-item ${note.id === activeNoteId ? 'active' : ''}`}
             onClick={() => onSelect(note.id)}
           >
-            <div className="note-item-color-bar" style={{ background: editorColor.bg }} />
+            {isGenerating ? (
+              <div className="note-thumbnail note-thumbnail--loading" />
+            ) : note.imageUrl ? (
+              <img src={note.imageUrl} alt="" className="note-thumbnail" />
+            ) : (
+              <div className="note-item-color-bar" style={{ background: editorColor.bg }} />
+            )}
             <div className="note-item-content">
               <div className={`note-item-title ${isAuto ? 'auto' : ''}`}>{displayTitle}</div>
               <div className="note-item-preview">

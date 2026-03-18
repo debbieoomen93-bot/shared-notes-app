@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useCallback } from 'react';
 import { getUserColor, getUserInitial } from '../userColor';
 import { getAutoTitle } from '../autoTitle';
 
-function NoteEditor({ note, onUpdate, saveStatus }) {
+function NoteEditor({ note, onUpdate, saveStatus, isGeneratingImage, onGenerateImage }) {
   const titleRef = useRef(null);
   const contentRef = useRef(null);
   const saveTimerRef = useRef(null);
@@ -112,6 +112,25 @@ function NoteEditor({ note, onUpdate, saveStatus }) {
 
   return (
     <div className="editor">
+      {/* Banner image */}
+      {isGeneratingImage ? (
+        <div className="editor-banner editor-banner--loading">
+          <div className="editor-banner-shimmer" />
+        </div>
+      ) : note.imageUrl ? (
+        <div className="editor-banner">
+          <img src={note.imageUrl} alt="" className="editor-banner-img" />
+          <div className="editor-banner-overlay" />
+          <button
+            className="editor-banner-regen"
+            onClick={onGenerateImage}
+            title="Regenerate image"
+          >
+            ✦ Regenerate
+          </button>
+        </div>
+      ) : null}
+
       <div className="editor-header">
         <input
           ref={titleRef}
