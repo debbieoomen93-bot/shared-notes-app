@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useCallback } from 'react';
 import { getUserColor, getUserInitial } from '../userColor';
 import { getAutoTitle } from '../autoTitle';
 
-function NoteEditor({ note, onUpdate, saveStatus }) {
+function NoteEditor({ note, onUpdate, saveStatus, isGeneratingImage, onGenerateImage }) {
   const titleRef = useRef(null);
   const contentRef = useRef(null);
   const saveTimerRef = useRef(null);
@@ -112,6 +112,29 @@ function NoteEditor({ note, onUpdate, saveStatus }) {
 
   return (
     <div className="editor">
+      {/* Banner image */}
+      {isGeneratingImage ? (
+        <div className="editor-banner editor-banner--loading">
+          <div className="editor-banner-shimmer" />
+        </div>
+      ) : note.imageUrl ? (
+        <div className="editor-banner">
+          <img src={note.imageUrl} alt="" className="editor-banner-img" />
+          <div className="editor-banner-overlay" />
+          <button
+            className="editor-banner-regen"
+            onClick={onGenerateImage}
+            title="Regenerate image"
+          >
+            ✦ Regenerate
+          </button>
+        </div>
+      ) : (
+        <button className="editor-banner-generate" onClick={onGenerateImage}>
+          ✦ Generate image
+        </button>
+      )}
+
       <div className="editor-header">
         <input
           ref={titleRef}
@@ -122,6 +145,7 @@ function NoteEditor({ note, onUpdate, saveStatus }) {
         />
         <span className={`save-status ${saveStatus}`}>{statusText}</span>
       </div>
+      <div className="editor-title-divider" />
       <div
         ref={contentRef}
         className="editor-content"
@@ -134,7 +158,7 @@ function NoteEditor({ note, onUpdate, saveStatus }) {
       <div className="editor-footer">
         <div className="editor-footer-left">
           <span className="edited-by">
-            <span className="edited-by-avatar" style={{ background: creatorColor.bg }}>
+            <span className="edited-by-avatar" style={{ borderColor: creatorColor.accent, color: creatorColor.accent }}>
               {getUserInitial(note.createdBy)}
             </span>
             <span className="edited-by-name" style={{ color: creatorColor.accent }}>
@@ -144,7 +168,7 @@ function NoteEditor({ note, onUpdate, saveStatus }) {
           </span>
           {note.lastEditedBy && (
             <span className="edited-by">
-              <span className="edited-by-avatar" style={{ background: editorColor.bg }}>
+              <span className="edited-by-avatar" style={{ borderColor: editorColor.accent, color: editorColor.accent }}>
                 {getUserInitial(note.lastEditedBy)}
               </span>
               <span className="edited-by-name" style={{ color: editorColor.accent }}>
