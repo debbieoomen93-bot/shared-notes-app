@@ -196,8 +196,7 @@ function App() {
       handleGenerateImage(activeNote);
     }, 4000);
     return () => clearTimeout(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeNote?.id, activeNote?.imageUrl, activeNote?.content]);
+  }, [activeNote?.id, activeNote?.imageUrl, activeNote?.content]); // eslint-disable-line
 
   // Show username prompt if no username set
   if (!username) {
