@@ -144,11 +144,11 @@
 .editor-banner-generate {
   display: block;
   width: 100%;
-  padding: 10px;
-  background: transparent;
+  padding: 12px;
+  background: rgba(201, 164, 66, 0.05);
   border: none;
-  border-bottom: 1px solid rgba(201, 164, 66, 0.08);
-  color: rgba(201, 164, 66, 0.35);
+  border-bottom: 1px solid rgba(201, 164, 66, 0.15);
+  color: rgba(201, 164, 66, 0.7);
   font-size: 11px;
   font-family: inherit;
   letter-spacing: 0.1em;
@@ -158,9 +158,10 @@
   flex-shrink: 0;
 }
 
-.editor-banner-generate:hover {
+.editor-banner-generate:hover,
+.editor-banner-generate:active {
   color: var(--gold);
-  background: rgba(201, 164, 66, 0.04);
+  background: rgba(201, 164, 66, 0.1);
 }
 
 /* =====================
