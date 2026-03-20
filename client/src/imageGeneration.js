@@ -3,13 +3,15 @@
 // and returns it ready for storage in Firebase.
 
 export async function generateNoteImage(title, content) {
-  const plainText = (content || '')
+  const raw = (content || '')
     .replace(/<[^>]*>/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
-    .substring(0, 300);
+    .substring(0, 150);
+  // Truncate at last word boundary to avoid mid-word cuts
+  const plainText = raw.includes(' ') ? raw.substring(0, raw.lastIndexOf(' ')) : raw;
 
-  const noteTitle = (title || 'Untitled').substring(0, 100);
+  const noteTitle = (title || 'Untitled').substring(0, 60);
 
   const prompt = [
     `atmospheric painterly illustration for a note titled "${noteTitle}"`,
@@ -20,8 +22,13 @@ export async function generateNoteImage(title, content) {
   const seed = Math.floor(Math.random() * 1_000_000);
   const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=800&height=450&nologo=true&seed=${seed}`;
 
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`Pollinations returned ${response.status}`);
+  let response;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    response = await fetch(url);
+    if (response.ok) break;
+    if (response.status !== 500 || attempt === 3) throw new Error(`Pollinations returned ${response.status}`);
+    await new Promise(r => setTimeout(r, attempt * 2000));
+  }
 
   const blob = await response.blob();
 
