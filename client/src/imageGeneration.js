@@ -23,11 +23,11 @@ export async function generateNoteImage(title, content) {
   const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=800&height=450&nologo=true&seed=${seed}`;
 
   let response;
-  for (let attempt = 1; attempt <= 3; attempt++) {
+  for (let attempt = 1; attempt <= 4; attempt++) {
     response = await fetch(url);
     if (response.ok) break;
-    if (response.status !== 500 || attempt === 3) throw new Error(`Pollinations returned ${response.status}`);
-    await new Promise(r => setTimeout(r, attempt * 2000));
+    if (response.status < 500 || attempt === 4) throw new Error(`Pollinations returned ${response.status}`);
+    await new Promise(r => setTimeout(r, attempt * 3000));
   }
 
   const blob = await response.blob();
