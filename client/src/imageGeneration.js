@@ -7,11 +7,11 @@ export async function generateNoteImage(title, content) {
     .replace(/<[^>]*>/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
-    .substring(0, 150);
+    .substring(0, 100);
   // Truncate at last word boundary to avoid mid-word cuts
   const plainText = raw.includes(' ') ? raw.substring(0, raw.lastIndexOf(' ')) : raw;
 
-  const noteTitle = (title || 'Untitled').substring(0, 60);
+  const noteTitle = (title || 'Untitled').substring(0, 50);
 
   const prompt = [
     `atmospheric painterly illustration for a note titled "${noteTitle}"`,
