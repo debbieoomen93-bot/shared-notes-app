@@ -3,7 +3,7 @@ import NotesList from './components/NotesList';
 import NoteEditor from './components/NoteEditor';
 import TrashBin from './components/TrashBin';
 import Toolbar from './components/Toolbar';
-import { subscribeToNotes, createNote, updateNote, softDeleteNote } from './firebase';
+import { subscribeToNotes, createNote, updateNote, softDeleteNote, removeAllImageUrls } from './firebase';
 import { getUserColor, getUserInitial } from './userColor';
 import { getDisplayTitle } from './autoTitle';
 import './App.css';
@@ -112,6 +112,7 @@ function App() {
   }, [activeNoteId]);
 
   useEffect(() => {
+    removeAllImageUrls();
     const unsubscribe = subscribeToNotes((allNotes) => {
       setNotes(allNotes);
       setNotesLoaded(true);
