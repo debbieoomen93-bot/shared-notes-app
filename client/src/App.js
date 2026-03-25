@@ -3,10 +3,9 @@ import NotesList from './components/NotesList';
 import NoteEditor from './components/NoteEditor';
 import TrashBin from './components/TrashBin';
 import Toolbar from './components/Toolbar';
-import { subscribeToNotes, createNote, updateNote, softDeleteNote } from './firebase';
+import { subscribeToNotes, createNote, updateNote, softDeleteNote, removeAllImageUrls } from './firebase';
 import { getUserColor, getUserInitial } from './userColor';
 import { getDisplayTitle } from './autoTitle';
-import { generateNoteImage } from './imageGeneration';
 import './App.css';
 
 function getUsername() {
@@ -31,9 +30,6 @@ function App() {
   const [theme, setTheme] = useState(getTheme);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth <= 768);
   const [notesLoaded, setNotesLoaded] = useState(false);
-  // Set of note IDs currently having an image generated
-  const [generatingImages, setGeneratingImages] = useState(new Set());
-  const generatingImagesRef = useRef(new Set());
 
   const userColor = getUserColor(username);
   const touchStartRef = useRef(null);
@@ -116,6 +112,7 @@ function App() {
   }, [activeNoteId]);
 
   useEffect(() => {
+    removeAllImageUrls();
     const unsubscribe = subscribeToNotes((allNotes) => {
       setNotes(allNotes);
       setNotesLoaded(true);
@@ -162,21 +159,6 @@ function App() {
     }
   }, [activeNoteId]);
 
-  const handleGenerateImage = useCallback(async (note) => {
-    if (generatingImagesRef.current.has(note.id)) return;
-    generatingImagesRef.current.add(note.id);
-    setGeneratingImages(new Set(generatingImagesRef.current));
-    try {
-      const imageUrl = await generateNoteImage(note.title || '', note.content || '');
-      await updateNote(note.id, { imageUrl });
-    } catch (err) {
-      console.error('Image generation failed:', err.message);
-    } finally {
-      generatingImagesRef.current.delete(note.id);
-      setGeneratingImages(new Set(generatingImagesRef.current));
-    }
-  }, []);
-
   const handleUpdateNote = useCallback((id, updates) => {
     setSaveStatus('saving');
     updateNote(id, { ...updates, lastEditedBy: username }).then(() => {
@@ -184,19 +166,7 @@ function App() {
     });
   }, [username]);
 
-  // Auto-generate an image the first time a note has enough content
   const activeNote = notes.find(n => n.id === activeNoteId);
-  useEffect(() => {
-    if (!activeNote || activeNote.imageUrl || activeNote.deleted) return;
-    const plainText = (activeNote.content || '').replace(/<[^>]*>/g, '').trim();
-    if (plainText.length < 50) return;
-    if (generatingImagesRef.current.has(activeNote.id)) return;
-
-    const timer = setTimeout(() => {
-      handleGenerateImage(activeNote);
-    }, 4000);
-    return () => clearTimeout(timer);
-  }, [activeNote?.id, activeNote?.imageUrl, activeNote?.content]); // eslint-disable-line
 
   // Show username prompt if no username set
   if (!username) {
@@ -247,7 +217,6 @@ function App() {
           activeNoteId={activeNoteId}
           onSelect={handleSelectNote}
           onDelete={handleDeleteNote}
-          generatingImages={generatingImages}
         />
         <button
           className={`btn-trash ${showTrash ? 'active' : ''}`}
@@ -281,8 +250,6 @@ function App() {
               note={activeNote}
               onUpdate={handleUpdateNote}
               saveStatus={saveStatus}
-              isGeneratingImage={generatingImages.has(activeNote.id)}
-              onGenerateImage={() => handleGenerateImage(activeNote)}
             />
           </>
         ) : !notesLoaded ? (

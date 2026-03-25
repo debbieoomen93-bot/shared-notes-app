@@ -77,4 +77,20 @@ export function permanentlyDeleteNote(noteId) {
   return remove(noteRef);
 }
 
+// One-time cleanup: remove imageUrl from all notes (leftover from old image generation feature).
+// Safe to call multiple times — only writes if imageUrl is present.
+export async function removeAllImageUrls() {
+  const snapshot = await get(ref(db, 'notes'));
+  if (!snapshot.exists()) return;
+  const updates = {};
+  snapshot.forEach((child) => {
+    if (child.val().imageUrl !== undefined) {
+      updates[`notes/${child.key}/imageUrl`] = null;
+    }
+  });
+  if (Object.keys(updates).length > 0) {
+    await update(ref(db), updates);
+  }
+}
+
 export { db };

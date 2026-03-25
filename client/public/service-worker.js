@@ -32,10 +32,9 @@ self.addEventListener('activate', (event) => {
 
 // Fetch - network first, fall back to cache
 self.addEventListener('fetch', (event) => {
-  // Skip non-GET, Firebase, and external image generation requests
+  // Skip non-GET and Firebase requests
   if (event.request.method !== 'GET') return;
   if (event.request.url.includes('firebaseio.com') || event.request.url.includes('googleapis.com')) return;
-  if (event.request.url.includes('pollinations.ai')) return;
   // Skip chrome-extension and other non-http(s) schemes
   if (!event.request.url.startsWith('http')) return;
 
